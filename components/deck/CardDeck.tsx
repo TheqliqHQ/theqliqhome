@@ -61,7 +61,6 @@ export default function CardDeck() {
       const slug = (cards[activeIndex] as any).slug;
       if (slug) {
         openDetail();
-        // Fixed: removed shallow (invalid in App Router)
         router.push(`/?card=${slug}`, { scroll: false });
       }
     }
@@ -70,7 +69,6 @@ export default function CardDeck() {
     (window as any).lastMoveY = 0;
   }
 
-  // ✅ Fixed typing issue — use `Variants` and mutable arrays
   const stackVariants: Variants = {
     rest: {
       scale: 1,
@@ -287,11 +285,8 @@ export default function CardDeck() {
             )}
           </div>
 
-          <CardDetail
-            index={activeIndex}
-            title={(cards[activeIndex] as any).title}
-            summary={(cards[activeIndex] as any).summary}
-          />
+          {/* 🔧 FIX: CardDetail only receives { index } */}
+          <CardDetail index={activeIndex} />
         </LayoutGroup>
       </section>
     );
@@ -320,8 +315,7 @@ export default function CardDeck() {
                   transition={{
                     duration: 0.5,
                     ease: [0.22, 0.7, 0.23, 0.95],
-                    delay:
-                      ((i % 3) * 0.06) + Math.floor(i / 3) * 0.04,
+                    delay: (i % 3) * 0.06 + Math.floor(i / 3) * 0.04,
                   }}
                 >
                   <Card index={i} active={false} data={c as any} />
