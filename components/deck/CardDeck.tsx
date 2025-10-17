@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, LayoutGroup, PanInfo } from "framer-motion";
+import { motion, LayoutGroup, PanInfo, type Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import cards from "@/content/cards.json";
 import { useUI } from "@/lib/store";
@@ -13,7 +13,7 @@ export default function CardDeck() {
     mode,
     activeIndex,
     setTotal,
-    openDetail,          // overlay open (no full page nav)
+    openDetail,
     cycleColor,
     advanceIndexOnly,
   } = useUI() as any;
@@ -29,9 +29,9 @@ export default function CardDeck() {
 
   const [isFlinging, setIsFlinging] = useState(false);
   const [flyingIndex, setFlyingIndex] = useState<number | null>(null);
-  const [suppressActiveDuringFling, setSuppressActiveDuringFling] = useState(false);
+  const [suppressActiveDuringFling, setSuppressActiveDuringFling] =
+    useState(false);
 
-  // ---------- Tap / Drag intent detection ----------
   const TAP_SLOP_PX = 8;
   const TAP_MAX_MS = 300;
   const DRAG_MUTE_MS = 180;
@@ -58,11 +58,10 @@ export default function CardDeck() {
     const isTap = dt <= TAP_MAX_MS && moved <= TAP_SLOP_PX;
 
     if (!muted && isTap && !isFlinging) {
-      // OPEN OVERLAY (don’t leave the page)
       const slug = (cards[activeIndex] as any).slug;
       if (slug) {
         openDetail();
-        // App Router doesn't support `shallow` — staying on the same page is implicit.
+        // Fixed: removed shallow (invalid in App Router)
         router.push(`/?card=${slug}`, { scroll: false });
       }
     }
@@ -71,29 +70,34 @@ export default function CardDeck() {
     (window as any).lastMoveY = 0;
   }
 
-  // ---------- Variants ----------
-  const stackVariants = {
-    rest: { scale: 1, y: 0, rotateZ: 0, x: 0, filter: "none", transition: { duration: 0.18 } },
+  // ✅ Fixed typing issue — use `Variants` and mutable arrays
+  const stackVariants: Variants = {
+    rest: {
+      scale: 1,
+      y: 0,
+      rotateZ: 0,
+      x: 0,
+      transition: { duration: 0.18 },
+    },
     impact: {
       scale: [1, 1.036, 1.0, 1.006, 1.002, 1],
       y: [0, -4, 0, -1.6, 0.8, 0],
       x: [0, 0, 0, 0.8, -0.6, 0],
       rotateZ: [0, -0.22, 0, -0.1, 0.06, 0],
-      filter: ["none", "brightness(1.02)", "none", "none", "none", "none"],
+      filter: ["none", "brightness(1.02)", "none", "none", "none", "none"] as any,
       transition: {
         duration: 0.86,
         ease: ["easeOut", "easeInOut", "easeInOut", "easeInOut", "easeOut"],
         times: [0, 0.32, 0.4, 0.66, 0.84, 1],
       },
     },
-  } as const;
+  };
 
   const backerVariants = {
     rest: BASE_BACK_POSE,
     hold: { ...BASE_BACK_POSE, transition: { duration: 0.001 } },
   } as const;
 
-  // ---------- Helpers / Handlers ----------
   const current = activeIndex;
   const nextIdx = (activeIndex + 1) % cards.length;
 
@@ -138,7 +142,6 @@ export default function CardDeck() {
       return;
     }
     if (open) {
-      // OPEN OVERLAY on right-swipe
       const slug = (cards[current] as any).slug;
       if (slug) {
         openDetail();
@@ -147,18 +150,13 @@ export default function CardDeck() {
       setBodyDragging(false);
       return;
     }
-    // small drags snap back; also mute accidental taps
     dragMuteUntil.current = performance.now() + DRAG_MUTE_MS;
     setBodyDragging(false);
   }
 
-  /* ===========================
-     STORY MODE (centered stack)
-     =========================== */
   if (mode === "story") {
     return (
       <section className="relative w-full grid place-items-center py-24">
-        {/* Side CTAs */}
         <button
           onClick={flingNextByClick}
           disabled={isFlinging}
@@ -185,13 +183,11 @@ export default function CardDeck() {
 
         <LayoutGroup id="story">
           <div className="relative">
-            {/* Stack container (your sizes/perspective) */}
             <motion.div
               className="relative w-[220px] h-[308px] md:w-[240px] md:h-[336px] lg:w-[250px] lg:h-[360px] [perspective:1200px]"
               variants={stackVariants}
               animate={isFlinging ? "impact" : "rest"}
             >
-              {/* Backer (next card) */}
               <motion.div
                 key={"backer-" + nextIdx}
                 className="absolute inset-0 will-change-transform"
@@ -205,7 +201,6 @@ export default function CardDeck() {
                 </div>
               </motion.div>
 
-              {/* Active card — draggable */}
               {!(
                 isFlinging && suppressActiveDuringFling && flyingIndex !== null
               ) && (
@@ -232,14 +227,23 @@ export default function CardDeck() {
               )}
             </motion.div>
 
-            {/* Flying overlay (3D fling) */}
             {flyingIndex !== null && (
               <motion.div
                 key={"flying-" + flyingIndex}
                 className="absolute inset-0 pointer-events-none will-change-transform"
-                style={{ transformOrigin: "50% 50%", transformStyle: "preserve-3d" }}
+                style={{
+                  transformOrigin: "50% 50%",
+                  transformStyle: "preserve-3d",
+                }}
                 variants={{
-                  start: { x: 0, y: 0, rotateZ: 0, rotateY: 0, scale: 1, opacity: 1 },
+                  start: {
+                    x: 0,
+                    y: 0,
+                    rotateZ: 0,
+                    rotateY: 0,
+                    scale: 1,
+                    opacity: 1,
+                  },
                   fly: {
                     x: ["0vw", "-22vw", "-58vw", "-105vw", "-150vw"],
                     y: ["0px", "-8px", "-12px", "-9px", "-6px"],
@@ -247,7 +251,10 @@ export default function CardDeck() {
                     rotateY: [0, 40, 140, 210, 280],
                     scale: [1, 1.012, 1.02, 1.02, 1.02],
                     opacity: [1, 0.96, 0.82, 0.72, 0.6],
-                    transition: { duration: 1.2, ease: [0.18, 0.55, 0.22, 0.96] },
+                    transition: {
+                      duration: 1.2,
+                      ease: [0.18, 0.55, 0.22, 0.96],
+                    },
                   },
                 }}
                 initial="start"
@@ -261,7 +268,10 @@ export default function CardDeck() {
               >
                 <div
                   className="absolute inset-0"
-                  style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+                  style={{
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                  }}
                 >
                   <Card index={flyingIndex} active data={cards[flyingIndex] as any} />
                 </div>
@@ -277,7 +287,6 @@ export default function CardDeck() {
             )}
           </div>
 
-          {/* Detail overlay (renders above the deck) */}
           <CardDetail
             index={activeIndex}
             title={(cards[activeIndex] as any).title}
@@ -288,9 +297,7 @@ export default function CardDeck() {
     );
   }
 
-  /* ===========================
-     GRID MODE (3-up gallery)
-     =========================== */
+  // GRID MODE
   return (
     <section className="w-full py-4">
       <div className="mx-auto w-full max-w-[960px] px-3 sm:px-4 md:px-6">
@@ -301,12 +308,7 @@ export default function CardDeck() {
               return (
                 <motion.div
                   key={"grid-" + i}
-                  className="
-                    w-[176px] h-[246px]
-                    md:w-[186px] md:h-[260px]
-                    lg:w-[250px] lg:h-[360px]
-                    cursor-pointer
-                  "
+                  className="w-[176px] h-[246px] md:w-[186px] md:h-[260px] lg:w-[250px] lg:h-[360px] cursor-pointer"
                   onClick={() => {
                     if (!slug) return;
                     openDetail();
@@ -318,7 +320,8 @@ export default function CardDeck() {
                   transition={{
                     duration: 0.5,
                     ease: [0.22, 0.7, 0.23, 0.95],
-                    delay: ((i % 3) * 0.06) + (Math.floor(i / 3) * 0.04),
+                    delay:
+                      ((i % 3) * 0.06) + Math.floor(i / 3) * 0.04,
                   }}
                 >
                   <Card index={i} active={false} data={c as any} />
