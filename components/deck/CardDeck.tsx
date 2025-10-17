@@ -31,9 +31,7 @@ export default function CardDeck() {
   const [flyingIndex, setFlyingIndex] = useState<number | null>(null);
   const [suppressActiveDuringFling, setSuppressActiveDuringFling] = useState(false);
 
-  /* ---------------------------------------------------------
-     Tap / Drag intent detection (kept from your version)
-     --------------------------------------------------------- */
+  // ---------- Tap / Drag intent detection ----------
   const TAP_SLOP_PX = 8;
   const TAP_MAX_MS = 300;
   const DRAG_MUTE_MS = 180;
@@ -64,7 +62,8 @@ export default function CardDeck() {
       const slug = (cards[activeIndex] as any).slug;
       if (slug) {
         openDetail();
-        router.push(`/?card=${slug}`, { shallow: true, scroll: false });
+        // App Router doesn't support `shallow` — staying on the same page is implicit.
+        router.push(`/?card=${slug}`, { scroll: false });
       }
     }
     downXY.current = null;
@@ -72,9 +71,7 @@ export default function CardDeck() {
     (window as any).lastMoveY = 0;
   }
 
-  /* -----------------------------
-     Variants (unchanged)
-     ----------------------------- */
+  // ---------- Variants ----------
   const stackVariants = {
     rest: { scale: 1, y: 0, rotateZ: 0, x: 0, filter: "none", transition: { duration: 0.18 } },
     impact: {
@@ -96,9 +93,7 @@ export default function CardDeck() {
     hold: { ...BASE_BACK_POSE, transition: { duration: 0.001 } },
   } as const;
 
-  /* -----------------------------
-     Helpers / Handlers
-     ----------------------------- */
+  // ---------- Helpers / Handlers ----------
   const current = activeIndex;
   const nextIdx = (activeIndex + 1) % cards.length;
 
@@ -147,7 +142,7 @@ export default function CardDeck() {
       const slug = (cards[current] as any).slug;
       if (slug) {
         openDetail();
-        router.push(`/?card=${slug}`, { shallow: true, scroll: false });
+        router.push(`/?card=${slug}`, { scroll: false });
       }
       setBodyDragging(false);
       return;
@@ -178,7 +173,7 @@ export default function CardDeck() {
             const slug = (cards[current] as any).slug;
             if (slug) {
               openDetail();
-              router.push(`/?card=${slug}`, { shallow: true, scroll: false });
+              router.push(`/?card=${slug}`, { scroll: false });
             }
           }}
           disabled={isFlinging}
@@ -314,9 +309,8 @@ export default function CardDeck() {
                   "
                   onClick={() => {
                     if (!slug) return;
-                    // OPEN OVERLAY (grid mode)
                     openDetail();
-                    router.push(`/?card=${slug}`, { shallow: true, scroll: false });
+                    router.push(`/?card=${slug}`, { scroll: false });
                   }}
                   initial={{ opacity: 0, y: 18, scale: 0.96 }}
                   whileInView={{ opacity: 1, y: 0, scale: 1 }}
