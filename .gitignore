@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+.pnp.*
+.pnpm-store/
+npm-debug.log*
+
+# next.js
+.next/
+out/
+.vercel/
+.env.local
+.env*.local
+
+# builds / tooling
+dist/
+build/
+coverage/
+.turbo/
+.cache/
+
+# OS / editor
+.DS_Store
+*.log
+.vscode/

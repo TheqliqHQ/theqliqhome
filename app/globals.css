@@ -1,0 +1,249 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   Global Variables
+   ========================================================= */
+:root {
+  --brand-sans: "Google Sans", Inter, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+
+  /* Stage default colors */
+  --stage-bg: #2e6ce6; /* blue */
+  --stage-fg: #ffffff; /* white */
+}
+
+/* =========================================================
+   HTML + Body Global Layout
+   ========================================================= */
+html,
+body,
+:root {
+  height: 100%;
+  min-height: 100%;
+}
+
+/* General body defaults */
+body {
+  font-family: var(--brand-sans);
+  background: var(--stage-bg);
+  color: var(--stage-fg);
+  overflow-x: hidden; /* prevent horizontal scroll globally */
+}
+
+/* Helper for fixed elements to avoid transform clipping */
+.fixed-escape {
+  transform: none !important;
+  will-change: auto;
+}
+
+/* =========================================================
+   SCROLL BEHAVIOR MODES
+   ========================================================= */
+
+/* Story mode — one-screen, no scroll */
+body[data-mode="story"] {
+  height: 100svh;
+  overflow: hidden !important;
+}
+
+/* Grid mode — normal scrollable page */
+body[data-mode="grid"] {
+  height: auto;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* =========================================================
+   Typography
+   ========================================================= */
+.brand-subtitle {
+  font-family: var(--brand-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 28px;
+  color: #fff;
+}
+
+/* CTA type (Next card / Show me!) */
+.cta-text {
+  @apply text-white font-bold text-[36px] leading-[44px];
+}
+
+/* =========================================================
+   Card Surfaces (no shadows)
+   ========================================================= */
+.rounded-card {
+  border-radius: 28px;
+}
+
+.paper-grain {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.paper-surface {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.paper-back {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  filter: none;
+  opacity: 0.96;
+}
+
+/* =========================================================
+   Stage Layout
+   ========================================================= */
+.stage {
+  @apply h-screen w-screen overflow-hidden;
+}
+
+/* =========================================================
+   Contact Modal Helpers (scroll lock + dock hide)
+   ========================================================= */
+body[data-modal="open"] {
+  overflow: hidden; /* lock page scroll */
+}
+
+body[data-modal="open"] .toggle-dock {
+  display: none !important;
+}
+
+/* iOS fix: prevent rubber-band scrolling underneath the modal */
+@supports (-webkit-touch-callout: none) {
+  body[data-modal="open"] {
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   Form Inputs (used in contact modal)
+   ========================================================= */
+.input {
+  @apply h-11 w-full rounded-lg border border-slate-200 px-3
+    bg-white outline-none focus:ring-2 focus:ring-blue-400;
+}
+
+/* =========================================================
+   Responsive tweaks
+   ========================================================= */
+
+/* Ensure header/footer always appear above cards (story mode) */
+header,
+footer {
+  z-index: 100;
+}
+
+/* Prevent global horizontal scroll on mobile */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   GRID-MODE OVERRIDES (so header/footer scroll and deck is in flow)
+   ========================================================= */
+
+/* In grid mode, switch the fixed header/footer to normal flow so they scroll */
+body[data-mode="grid"] .app-header,
+body[data-mode="grid"] .app-footer {
+  position: static !important;
+  inset: auto !important;
+  z-index: 20 !important; /* below the dock */
+}
+
+/* In grid mode, make the deck layer part of normal document flow */
+body[data-mode="grid"] .deck-layer {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+}
+
+/* Ensure the page scrolls naturally in grid mode */
+body[data-mode="grid"] main {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Hide footer + dock when a card page is open */
+body[data-detail="open"] footer { display: none !important; }
+body[data-detail="open"] .toggle-dock { display: none !important; }
+
+
+
+/* Optional breathing room so grid doesn't crowd header/footer */
+body[data-mode="grid"] .deck-layer > section:first-child {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+
+  
+}
+
+
+/* Hide footer + dock whenever a card page is open */
+body[data-detail="open"] footer,
+body[data-detail="open"] .toggle-dock {
+  display: none !important;
+}
+
+/* Keep header initially visible in detail view, then hide once content card is in view */
+body[data-detail="open"][data-header="hide"] header {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+body[data-detail="open"][data-header="show"] header {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+
+/* =========================
+   Card Detail overlay behavior
+   ========================= */
+
+/* When a card page is open: hide toggle and footer by default */
+body[data-detail="open"] .toggle-dock {
+  display: none !important;
+}
+body[data-detail="open"] footer {
+  display: none !important;
+}
+
+/* When we reach the end (sentinel visible), re-show footer */
+body.detail-footer-show footer {
+  display: grid !important; /* matches your footer grid layout */
+}
+
+/* Optional: slide header out once the page scrolls a bit (if you want) */
+/*
+body[data-detail="open"].scrolled header {
+  transform: translateY(-100%);
+  transition: transform .28s ease;
+}
+*/
+
+/* Detail: header above, footer/toggle hidden until sentinel */
+header { position: relative; z-index: 120; }
+
+body[data-detail="open"] .site-footer,
+body[data-detail="open"] .toggle-dock {
+  display: none !important;
+}
+
+/* When sentinel is visible, allow footer back in */
+body.detail-footer-show .site-footer {
+  display: block !important;
+}
+
+

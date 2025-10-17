@@ -1,0 +1,50 @@
+[
+  {
+    "id": 0,
+    "slug": "problem",
+    "chip": "The problem",
+    "title": "Your brand looks good. But it's not saying much",
+    "illustration": "/card11.png",
+    "contentPath": "problem.mdx"
+  },
+  {
+    "id": 1,
+    "slug": "meet-theqliq",
+    "chip": "Meet Theqliq",
+    "title": "We build brands that people remember and buy from",
+    "illustration": "/card1.png",
+    "contentPath": "meet-theqliq.mdx"
+  },
+  {
+    "id": 2,
+    "slug": "work",
+    "chip": "Our work",
+    "title": "See how we've helped brands find their voice and their people",
+    "illustration": "/work.gif",
+    "contentPath": "work.mdx"
+  },
+  {
+    "id": 3,
+    "slug": "contact-faq",
+    "chip": "Let's talk",
+    "title": "Real brands are built on real conversation. Let's have one",
+    "illustration": "/talk.gif",
+    "contentPath": "contact-faq.mdx"
+  },
+  {
+    "id": 4,
+    "slug": "careers",
+    "chip": "Join Theqliq",
+    "title": "We're building something worth joining",
+    "illustration": "/careers.png",
+    "contentPath": "careers.mdx"
+  },
+  {
+    "id": 5,
+    "slug": "blog",
+    "chip": "Blog",
+    "title": "Grab a coffee. Let's talk branding",
+    "illustration": "/blog.png",
+    "contentPath": "blog.mdx"
+  }
+]
