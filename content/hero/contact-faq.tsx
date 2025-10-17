@@ -1,25 +1,20 @@
-"use client";
-
+// content/hero/contact-faq.tsx
 import Image from "next/image";
 
 export default function ContactFaqHero({
   chip,
   title = "Let’s talk about your next big move",
-  figure = "/public/page/contact-hero.png", // replace with your asset path
+  figure = "/page/contact-hero.png", // <-- NO /public prefix
 }: {
-  chip: string;
+  chip?: string;
   title?: string;
   figure?: string;
 }) {
   return (
     <div
       className="
-        rounded-[28px]
-        bg-white
-        border border-black/5
-        paper-grain
-        px-8 md:px-10
-        py-10 md:py-14
+        rounded-[28px] bg-white border border-black/5 paper-grain
+        px-8 md:px-10 py-10 md:py-14
       "
       style={{ boxShadow: "none" }}
     >
