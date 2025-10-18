@@ -2,53 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------
+   Font (hosted): Open Sans – used everywhere including hero
+   --------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&display=swap");
+
 /* =========================================================
-   Global Variables
+   CSS Custom Props
    ========================================================= */
 :root {
-  --brand-sans: "Google Sans", Inter, system-ui, -apple-system, "Segoe UI",
+  /* Primary sans (Google Sans unavailable from CDN) */
+  --brand-sans: "Open Sans", Inter, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 
-  /* Stage default colors */
-  --stage-bg: #2e6ce6; /* blue */
-  --stage-fg: #ffffff; /* white */
+  /* Stage colors (background behind deck/hero) */
+  --stage-bg: #0e4fd3; /* blue you’re using */
+  --stage-fg: #ffffff;
 }
 
 /* =========================================================
-   HTML + Body Global Layout
+   Base layout
    ========================================================= */
-html,
-body,
-:root {
+html, body, :root {
   height: 100%;
   min-height: 100%;
 }
 
-/* General body defaults */
 body {
   font-family: var(--brand-sans);
   background: var(--stage-bg);
   color: var(--stage-fg);
-  overflow-x: hidden; /* prevent horizontal scroll globally */
+  overflow-x: hidden;  /* never horizontal scroll globally */
 }
 
-/* Helper for fixed elements to avoid transform clipping */
-.fixed-escape {
-  transform: none !important;
-  will-change: auto;
-}
+/* Keep fixed items from getting clipped by transforms */
+.fixed-escape { transform: none !important; will-change: auto; }
 
 /* =========================================================
-   SCROLL BEHAVIOR MODES
+   SCROLL MODES
    ========================================================= */
 
-/* Story mode — one-screen, no scroll */
+/* Story mode (card deck): full-screen, no scroll */
 body[data-mode="story"] {
   height: 100svh;
   overflow: hidden !important;
 }
 
-/* Grid mode — normal scrollable page */
+/* Grid mode (content pages): normal scroll */
 body[data-mode="grid"] {
   height: auto;
   overflow-y: auto !important;
@@ -56,145 +56,54 @@ body[data-mode="grid"] {
   scroll-behavior: smooth;
 }
 
-/* =========================================================
-   Typography
-   ========================================================= */
-.brand-subtitle {
-  font-family: var(--brand-sans);
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 28px;
-  color: #fff;
+/* When a hero/detail page is open:
+   - Body remains the single scroller
+   - Hide footer/toggle while in detail
+*/
+body[data-detail="open"] {
+  overflow-y: auto !important;   /* the ONLY scrollbar */
 }
-
-/* CTA type (Next card / Show me!) */
-.cta-text {
-  @apply text-white font-bold text-[36px] leading-[44px];
-}
-
-/* =========================================================
-   Card Surfaces (no shadows)
-   ========================================================= */
-.rounded-card {
-  border-radius: 28px;
-}
-
-.paper-grain {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px);
-  background-size: 3px 3px;
-}
-
-.paper-surface {
-  background-color: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: none;
-}
-
-.paper-back {
-  background-color: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: none;
-  filter: none;
-  opacity: 0.96;
-}
-
-/* =========================================================
-   Stage Layout
-   ========================================================= */
-.stage {
-  @apply h-screen w-screen overflow-hidden;
-}
-
-/* =========================================================
-   Contact Modal Helpers (scroll lock + dock hide)
-   ========================================================= */
-body[data-modal="open"] {
-  overflow: hidden; /* lock page scroll */
-}
-
-body[data-modal="open"] .toggle-dock {
+body[data-detail="open"] footer,
+body[data-detail="open"] .toggle-dock {
   display: none !important;
 }
 
-/* iOS fix: prevent rubber-band scrolling underneath the modal */
-@supports (-webkit-touch-callout: none) {
-  body[data-modal="open"] {
-    position: fixed;
-    width: 100%;
-  }
+/* Prevent nested scroll areas inside the detail layer */
+.detail-layer,
+.detail-layer * {
+  overscroll-behavior: contain;
+}
+.detail-layer .detail-viewport {
+  overflow: visible !important;
 }
 
 /* =========================================================
-   Form Inputs (used in contact modal)
+   Header/Footer layering and behavior
    ========================================================= */
-.input {
-  @apply h-11 w-full rounded-lg border border-slate-200 px-3
-    bg-white outline-none focus:ring-2 focus:ring-blue-400;
-}
+header, footer { z-index: 100; }
 
-/* =========================================================
-   Responsive tweaks
-   ========================================================= */
-
-/* Ensure header/footer always appear above cards (story mode) */
-header,
-footer {
-  z-index: 100;
-}
-
-/* Prevent global horizontal scroll on mobile */
-html,
-body {
-  overflow-x: hidden;
-}
-
-/* =========================================================
-   GRID-MODE OVERRIDES (so header/footer scroll and deck is in flow)
-   ========================================================= */
-
-/* In grid mode, switch the fixed header/footer to normal flow so they scroll */
+/* In grid mode, let header/footer scroll with the page */
 body[data-mode="grid"] .app-header,
 body[data-mode="grid"] .app-footer {
   position: static !important;
   inset: auto !important;
-  z-index: 20 !important; /* below the dock */
+  z-index: 20 !important;
 }
 
-/* In grid mode, make the deck layer part of normal document flow */
+/* Deck in grid mode should be in normal flow */
 body[data-mode="grid"] .deck-layer {
   position: static !important;
   inset: auto !important;
   z-index: auto !important;
 }
 
-/* Ensure the page scrolls naturally in grid mode */
-body[data-mode="grid"] main {
-  min-height: 100vh;
-  overflow-y: auto;
-}
-
-/* Hide footer + dock when a card page is open */
-body[data-detail="open"] footer { display: none !important; }
-body[data-detail="open"] .toggle-dock { display: none !important; }
-
-
-
-/* Optional breathing room so grid doesn't crowd header/footer */
+/* Optional breathing room for first deck section in grid mode */
 body[data-mode="grid"] .deck-layer > section:first-child {
   margin-top: 1.5rem;
   margin-bottom: 2rem;
-
-  
 }
 
-
-/* Hide footer + dock whenever a card page is open */
-body[data-detail="open"] footer,
-body[data-detail="open"] .toggle-dock {
-  display: none !important;
-}
-
-/* Keep header initially visible in detail view, then hide once content card is in view */
+/* Detail: keep header initially visible, allow fade/hide toggle */
 body[data-detail="open"][data-header="hide"] header {
   opacity: 0;
   transform: translateY(-12px);
@@ -207,43 +116,141 @@ body[data-detail="open"][data-header="show"] header {
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
+/* When sentinel marks end of content, footer can reappear (utility class) */
+body.detail-footer-show .site-footer { display: block !important; }
 
-/* =========================
-   Card Detail overlay behavior
-   ========================= */
+/* =========================================================
+   Stage helper (full-bleed background)
+   ========================================================= */
+.stage { @apply h-screen w-screen overflow-hidden; }
+.stage { background: var(--stage-bg); color: var(--stage-fg); }
 
-/* When a card page is open: hide toggle and footer by default */
-body[data-detail="open"] .toggle-dock {
-  display: none !important;
-}
-body[data-detail="open"] footer {
-  display: none !important;
-}
-
-/* When we reach the end (sentinel visible), re-show footer */
-body.detail-footer-show footer {
-  display: grid !important; /* matches your footer grid layout */
-}
-
-/* Optional: slide header out once the page scrolls a bit (if you want) */
-/*
-body[data-detail="open"].scrolled header {
-  transform: translateY(-100%);
-  transition: transform .28s ease;
-}
-*/
-
-/* Detail: header above, footer/toggle hidden until sentinel */
-header { position: relative; z-index: 120; }
-
-body[data-detail="open"] .site-footer,
-body[data-detail="open"] .toggle-dock {
-  display: none !important;
+/* =========================================================
+   Type helpers
+   ========================================================= */
+.brand-subtitle {
+  font-family: var(--brand-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 28px;
+  color: #fff;
 }
 
-/* When sentinel is visible, allow footer back in */
-body.detail-footer-show .site-footer {
-  display: block !important;
+/* CTA “Next card / Show me!” */
+.cta-text { @apply text-white font-bold text-[36px] leading-[44px]; }
+
+/* =========================================================
+   Card surfaces (no shadows)
+   ========================================================= */
+.rounded-card { border-radius: 28px; }
+
+.paper-grain {
+  background-image: radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+.paper-surface {
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none;
+}
+.paper-back {
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: none;
+  filter: none;
+  opacity: 0.96;
 }
 
+/* =========================================================
+   HERO — shared look for every hero file
+   ========================================================= */
 
+/* Ensure all hero content inherits the same font */
+.hero-title,
+.hero-scope,
+.hero-scope * {
+  font-family: var(--brand-sans) !important;
+}
+
+/* Title spec: 60/72, rgb(32,33,36) */
+.hero-title {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 60px;
+  line-height: 72px;
+  color: rgb(32, 33, 36);
+  letter-spacing: 0;
+  margin: 0;
+  max-width: 20ch;
+}
+@media (max-width: 1200px) {
+  .hero-title {
+    font-size: clamp(36px, 6vw, 60px);
+    line-height: clamp(42px, 7.2vw, 72px);
+  }
+}
+
+/* Hero grid layout: text left, art right (room for 424px image) */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  align-items: center;
+  gap: 32px;
+}
+@media (max-width: 1024px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 24px; }
+  .hero-right { justify-self: start; }
+}
+.hero-right { display: flex; align-items: center; justify-content: flex-start; }
+
+/* Image constraints: 424 × 570.5 */
+.hero-figure {
+  width: 424px;
+  height: 570.5px;  /* 570.47 rounded */
+  object-fit: contain;
+  display: block;
+}
+
+/* Art frame is transparent so hero files never add an extra “white box” */
+.hero-art-frame {
+  width: 100%;
+  aspect-ratio: 1/1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 24px;
+  background: transparent !important;
+}
+.hero-art-frame img,
+.hero-art-frame svg,
+.hero-art-frame video,
+.hero-art-frame canvas {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Chip appearance (color is set inline per card theme) */
+.hero-chip { box-shadow: 0 1px 0 rgba(0,0,0,.04); }
+
+/* Close button: always black circle with white “×” */
+.hero-close {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #000;     /* never inherits stage bg */
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.hero-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Small responsive touches
+   ========================================================= */
+html, body { overflow-x: hidden; } /* extra safety */

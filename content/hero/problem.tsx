@@ -1,52 +1,24 @@
 // content/hero/problem.tsx
-export default function ProblemHero({ chip }: { chip?: string }) {
+export default function ProblemHero() {
   return (
-    <div
-      style={{
-        borderRadius: 28,
-        background: "#fff",
-        padding: "36px 40px",
-        display: "grid",
-        gridTemplateColumns: "1fr 360px",
-        gap: 24,
-        alignItems: "center",
-      }}
-    >
-      <div>
-        <span
-          style={{
-            display: "inline-block",
-            padding: "6px 12px",
-            borderRadius: 9999,
-            background: "var(--stage-bg)",
-            color: "var(--stage-fg)",
-            fontSize: 12,
-            fontWeight: 700,
-          }}
-        >
-          {chip}
-        </span>
-        <h2
-          style={{
-            marginTop: 12,
-            fontSize: 40,
-            lineHeight: "48px",
-            fontWeight: 800,
-            color: "#0f172a",
-          }}
-        >
-          Your brand looks good. But it’s not saying much So here is how dami
-          can fixsss it.
-        </h2>
+    <div className="hero-grid">
+      {/* Left column = title */}
+      <div className="hero-left">
+        <h1 className="hero-title">
+          Render heavy<br />graphics in the<br />browser
+        </h1>
       </div>
-      <div
-        style={{
-          width: "100%",
-          height: 220,
-          borderRadius: 20,
-          background: `url(/hero/problem.png) center/cover no-repeat`,
-        }}
-      />
+
+      {/* Right column = image */}
+      <div className="hero-right">
+        {/* Next/Image is fine too; keep the CSS size the source of truth */}
+        <img
+          src="/public/hero/card1.png"
+          alt="Illustration"
+          className="hero-figure"
+          loading="eager"
+        />
+      </div>
     </div>
   );
 }

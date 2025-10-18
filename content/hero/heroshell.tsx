@@ -1,4 +1,3 @@
-// content/hero/HeroShell.tsx
 "use client";
 
 import type { ReactNode } from "react";
@@ -6,61 +5,92 @@ import type { ReactNode } from "react";
 type HeroShellProps = {
   chip?: string;
   onClose?: () => void;
-  /** Left column: your title, blurb, etc. */
-  children: ReactNode;
-  /** Right column: image or any visual (optional) */
-  rightSlot?: ReactNode;
+  children: ReactNode;         // LEFT column (text only)
+  rightSlot?: ReactNode;       // RIGHT column (image/visual only)
 };
 
-export default function HeroShell({ chip, onClose, children, rightSlot }: HeroShellProps) {
+/** Editable tokens for size/position */
+const CARD_MAX_W = 1200;       // width of the hero card
+const CARD_RADIUS = 80;        // corner radius
+const CARD_PADDING = { x: 100, y: 36 };
+const RIGHT_COL_W = 360;       // right visual width (md+)
+const TOP_OFFSET = 64;         // distance from header
+
+export default function HeroShell({
+  chip,
+  onClose,
+  children,
+  rightSlot,
+}: HeroShellProps) {
   return (
     <div
-      className="rounded-[28px] bg-white border border-black/10 relative"
-      style={{ padding: "36px 40px" }}
+      className="relative mx-auto w-full"
+      style={{ maxWidth: CARD_MAX_W, marginTop: TOP_OFFSET }}
     >
-      {/* Close button — anchored to the hero card */}
-      <button
-        aria-label="Close"
-        onClick={onClose}
-        className="grid place-items-center"
+      <div
+        className="relative w-full"
         style={{
-          position: "absolute",
-          top: 12,
-          right: 12,
-          width: 40,
-          height: 40,
-          borderRadius: 9999,
-          background: "var(--stage-fg, #ffffff)", // invert for contrast
-          color: "var(--stage-bg, #2E6CE6)",
-          fontWeight: 800,
-          lineHeight: "40px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+          background: "#f5f5f5",
+          borderRadius: CARD_RADIUS,
+          padding: `${CARD_PADDING.y}px ${CARD_PADDING.x}px`,
+          boxShadow: "0 0 0 1px rgba(0,0,0,0.08)",
         }}
       >
-        ×
-      </button>
-
-      {/* Chip – matches current stage bg/fg */}
-      <div style={{ marginBottom: 12 }}>
-        <span
+        {/* Close button – always black bg / white × */}
+        <button
+          aria-label="Close"
+          onClick={onClose}
+          className="grid place-items-center"
           style={{
-            display: "inline-block",
+            position: "absolute",
+            top: 70,
+            right: 85,
+            width: 40,
+            height: 40,
             borderRadius: 9999,
-            padding: "6px 12px",
-            fontSize: 12,
-            fontWeight: 600,
-            backgroundColor: "var(--stage-bg, #2E6CE6)",
-            color: "var(--stage-fg, #ffffff)",
+            background: "#000",
+            color: "#fff",
+            fontWeight: 100,
+            lineHeight: "40px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
           }}
         >
-          {chip || "Section"}
-        </span>
-      </div>
+          X
+        </button>
 
-      {/* Two-column hero layout (stacks on small screens) */}
-      <div className="grid gap-6 items-center md:grid-cols-[1fr,340px]">
-        <div>{children}</div>
-        {rightSlot ? <div className="min-h-[200px]">{rightSlot}</div> : null}
+        {/* Chip */}
+        {chip ? (
+          <div style={{ marginBottom: 12 }}>
+            <span
+              style={{
+                display: "inline-block",
+                borderRadius: 9999,
+                padding: "6px 12px",
+                fontSize: 12,
+                fontWeight: 600,
+                backgroundColor: "var(--stage-bg, #2E6CE6)",
+                color: "var(--stage-fg, #fff)",
+              }}
+            >
+              {chip}
+            </span>
+          </div>
+        ) : null}
+
+        {/* Two-column responsive layout */}
+        <div
+          className="grid gap-6 items-center"
+          style={{
+            gridTemplateColumns: rightSlot ? `minmax(0,1fr) ${RIGHT_COL_W}px` : "1fr",
+          }}
+        >
+          <div className="hero-scope hero-left">{children}</div>
+          {rightSlot ? (
+            <div className="hero-scope hero-right">
+              <div className="hero-art-frame">{rightSlot}</div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
